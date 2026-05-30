@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura & Silk | Serene Generative Art Background</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Minimalist Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter for editorial UI, Cormorant Garamond for prestigious serif typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Cormorant Garamond', 'serif'],
+                    },
+                    animation: {
+                        'float-gentle': 'floatGentle 8s ease-in-out infinite',
+                        'spin-slow': 'spin 30s linear infinite',
+                        'fade-in': 'fadeIn 1.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        floatGentle: {
+                            '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+                            '50%': { transform: 'translateY(-15px) rotate(1deg)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom scrollbar matching paper theme */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FAF6F0;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(44, 42, 41, 0.15);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(44, 42, 41, 0.3);
+        }
+
+        /* Sophisticated tactile glassmorphism on light backgrounds */
+        .editorial-glass {
+            background: rgba(250, 246, 240, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(44, 42, 41, 0.05);
+        }
+        
+        .editorial-card {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(44, 42, 41, 0.03);
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .editorial-card:hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -15px rgba(44, 42, 41, 0.06);
+            border-color: rgba(44, 42, 41, 0.1);
+        }
+
+        /* Real watercolor-on-paper fiber overlay */
+        .paper-grain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            content: "";
+            opacity: 0.07;
+            pointer-events: none;
+            z-index: 40;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+
+        canvas {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+</head>
+<body class="bg-[#FAF6F0] text-[#2C2A29] font-sans overflow-x-hidden antialiased">
+
+    <!-- Tactile Paper Overlay -->
+    <div class="paper-grain"></div>
+    
+    <!-- Generative Art Canvas (Acting as living serene wallpaper) -->
+    <canvas id="generative-canvas" class="fixed top-0 left-0 w-full h-full -z-10 block transition-opacity duration-1000"></canvas>
+
+    <nav class="fixed top-0 left-0 w-full z-50 editorial-glass px-8 py-5 flex justify-between items-center transition-all duration-300">
+        <div class="flex items-center space-x-4">
+            <div class="w-8 h-8 rounded-full border border-[#2C2A29]/10 p-[1px] flex items-center justify-center relative overflow-hidden">
+                <span class="font-serif font-light text-sm text-[#2C2A29]">α</span>
+                <!-- Subtle slowly rotating background gradient halo -->
+                <div class="absolute inset-0 bg-gradient-to-tr from-orange-200/20 via-green-100/10 to-amber-200/20 animate-spin-slow -z-10"></div>
+            </div>
+            <div>
+                <span class="font-serif text-sm tracking-[0.2em] uppercase block font-semibold text-[#2C2A29]">Aura & Silk</span>
+                <span class="text-[9px] tracking-[0.25em] uppercase text-gray-500 block -mt-0.5">Procedural Watercolor Canvas</span>
+            </div>
+        </div>
+
+        <!-- Mode Selectors and Controls -->
+        <div class="flex items-center space-x-3">
+            <!-- Mode Toggle -->
+            <button id="toggle-mode-btn" class="editorial-glass hover:bg-[#2C2A29]/5 px-4 py-2 rounded-full text-[10px] font-semibold tracking-widest uppercase transition-all duration-300 flex items-center space-x-2">
+                <i class="fa-solid fa-feather-pointed text-[#C28D75]"></i>
+                <span id="mode-btn-text">View Exhibition Layout</span>
+            </button>
+
+            <!-- Sound Synthesis Toggle -->
+            <button id="audio-toggle-btn" class="w-9 h-9 rounded-full editorial-glass hover:bg-[#2C2A29]/5 flex items-center justify-center transition-all duration-300 text-gray-400" title="Toggle Crystalline Chime Synth">
+                <i id="audio-icon" class="fa-solid fa-volume-xmark text-xs"></i>
+            </button>
+
+            <!-- Settings Slider Panel Toggle -->
+            <button id="controls-toggle-btn" class="w-9 h-9 rounded-full editorial-glass hover:bg-[#2C2A29]/5 flex items-center justify-center transition-all duration-300 text-[#2C2A29]" title="Artistic Adjustments">
+                <i class="fa-solid fa-sliders text-xs"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div id="control-panel" class="fixed top-24 right-8 w-80 z-50 editorial-glass rounded-2xl p-6 transition-all duration-500 transform translate-x-0 opacity-100 shadow-xl shadow-[#2C2A29]/5">
+        <div class="flex justify-between items-center mb-5 border-b border-[#2C2A29]/10 pb-3">
+            <h3 class="font-serif text-md font-medium tracking-wide text-[#2C2A29] flex items-center gap-2">
+                <i class="fa-solid fa-wand-magic-sparkles text-[#8A9A86] text-sm"></i> Aesthetic Parameters
+            </h3>
+            <button id="close-panel-btn" class="text-gray-400 hover:text-[#2C2A29] transition-colors">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+
+        <div class="space-y-4 text-xs">
+            <!-- Aesthetic Palette Selector -->
+            <div>
+                <label class="block text-[9px] uppercase tracking-[0.15em] text-gray-500 mb-1.5 font-medium">Color Palette Wash</label>
+                <select id="palette-select" class="w-full bg-[#FAF6F0] border border-[#2C2A29]/10 rounded-lg px-2.5 py-1.5 text-[#2C2A29] focus:outline-none focus:border-[#8A9A86] transition-all font-light">
+                    <option value="botanical">Japanese Tea Garden (Sage, Gold & Linen)</option>
+                    <option value="blush">Scent of Rose (Dusty Pinks, Ochre & Cream)</option>
+                    <option value="mist">Highland Mist (Slate Blue, Lavender & Silver)</option>
+                    <option value="terracotta">Earth & Alabaster (Clay, Sand & Warm Sand)</option>
+                    <option value="minimalist">Zen Monochrome (Ink-wash Charcoal & Ivory)</option>
+                </select>
+            </div>
+
+            <!-- Ribbon Thread Density -->
+            <div>
+                <div class="flex justify-between text-[9px] uppercase tracking-[0.15em] text-gray-500 mb-1 font-medium">
+                    <span>Silk Strand Density</span>
+                    <span id="ribbon-count-val">24 Strands</span>
+                </div>
+                <input id="ribbon-count-slider" type="range" min="8" max="64" step="2" value="24" class="w-full accent-[#8A9A86] bg-[#2C2A29]/5 h-1 rounded-lg appearance-none cursor-pointer">
+            </div>
+
+            <!-- Breeze Velocity -->
+            <div>
+                <div class="flex justify-between text-[9px] uppercase tracking-[0.15em] text-gray-500 mb-1 font-medium">
+                    <span>Thermal Breeze Speed</span>
+                    <span id="speed-val">Gentle</span>
+                </div>
+                <input id="speed-slider" type="range" min="0.2" max="2.0" step="0.1" value="0.8" class="w-full accent-[#8A9A86] bg-[#2C2A29]/5 h-1 rounded-lg appearance-none cursor-pointer">
+            </div>
+
+            <!-- Thread Spline Complexity -->
+            <div>
+                <div class="flex justify-between text-[9px] uppercase tracking-[0.15em] text-gray-500 mb-1 font-medium">
+                    <span>Thread Tension / Fluidity</span>
+                    <span id="tension-val">Fluid Waves</span>
+                </div>
+                <input id="tension-slider" type="range" min="2" max="8" step="1" value="5" class="w-full accent-[#8A9A86] bg-[#2C2A29]/5 h-1 rounded-lg appearance-none cursor-pointer">
+            </div>
+
+            <!-- Interactive Mouse Brush Mode -->
+            <div>
+                <label class="block text-[9px] uppercase tracking-[0.15em] text-gray-500 mb-1.5 font-medium">Interaction Technique</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <button id="brush-breeze" class="brush-btn py-1.5 rounded-lg text-[10px] font-medium bg-[#2C2A29] text-white transition-all" data-mode="breeze">Breeze Ripple</button>
+                    <button id="brush-paint" class="brush-btn py-1.5 rounded-lg text-[10px] font-medium border border-[#2C2A29]/10 hover:bg-[#2C2A29]/5 text-[#2C2A29] transition-all" data-mode="paint">Watercolor Bleed</button>
+                </div>
+            </div>
+
+            <hr class="border-[#2C2A29]/5 my-3">
+
+            <div class="text-[10px] text-gray-500 leading-relaxed bg-[#2C2A29]/5 p-3 rounded-lg border border-[#2C2A29]/5 font-light">
+                <p class="mb-1.5"><i class="fa-solid fa-wind text-[#8A9A86] mr-1"></i> <strong>Aesthetic Note:</strong> Glide your cursor slowly across the page to create organic air currents. Click to release watercolor droplets.</p>
+                <p><i class="fa-solid fa-music text-[#C28D75] mr-1"></i> Unmute the sound chime module in the navigation header to experience reactive crystalline bells.</p>
+            </div>
+
+            <!-- Export Masterpiece Button -->
+            <button id="export-canvas-btn" class="w-full bg-[#2C2A29] hover:bg-[#403E3C] text-white font-medium py-2 px-3 rounded-lg text-[10px] uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-crop"></i> Export Fine Art Snapshot
+            </button>
+        </div>
+    </div>
+
+    <!-- Minimalist editorial art exhibition template designed to work flawlessly in front of the pastel background -->
+    <div id="portfolio-overlay" class="relative z-20 w-full min-h-screen opacity-0 pointer-events-none transition-all duration-1000 transform translate-y-8 flex flex-col justify-between">
+        
+        <!-- Hero Introduction Section -->
+        <header class="container mx-auto px-8 pt-36 pb-20 flex flex-col items-center text-center">
+            <div class="inline-flex items-center space-x-2 bg-[#2C2A29]/5 border border-[#2C2A29]/10 px-4 py-1 rounded-full text-[9px] uppercase tracking-[0.25em] text-[#2C2A29] mb-6">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#8A9A86] animate-ping"></span>
+                <span>Exhibition Room 04</span>
+            </div>
+            
+            <h1 class="font-serif text-4xl md:text-7xl font-light tracking-tight text-[#2C2A29] max-w-4xl leading-tight mb-6">
+                Where mathematics meets the <span class="italic text-[#C28D75]">delicacy</span> of handmade paper.
+            </h1>
+            
+            <p class="text-gray-500 text-sm md:text-base font-light max-w-xl leading-relaxed mb-10">
+                An organic digital canvas shifting silently like light filtering through leaves. Move your mouse or tap gently to guide the flowing silk.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+                <a href="#minimal-exhibition" class="px-6 py-3 rounded-full bg-[#2C2A29] text-white text-xs tracking-wider hover:bg-[#403E3C] transition-all duration-300">
+                    Enter Virtual Gallery
+                </a>
+                <button id="hero-customise-btn" class="px-6 py-3 rounded-full editorial-glass hover:bg-[#2C2A29]/5 text-[#2C2A29] text-xs tracking-wider transition-all duration-300">
+                    Adjust Composition
+                </button>
+            </div>
+        </header>
+
+        <section id="minimal-exhibition" class="container mx-auto px-8 py-24 border-t border-[#2C2A29]/10">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-4">
+                <div>
+                    <span class="text-[10px] uppercase tracking-[0.3em] text-[#8A9A86] font-semibold block mb-2">Exhibition Catalog</span>
+                    <h2 class="font-serif text-3xl md:text-4xl text-[#2C2A29] font-light">Organic Serenity Series</h2>
+                </div>
+                <p class="text-gray-500 max-w-sm text-xs leading-relaxed font-light">
+                    Sparsely placed, highly refined architectural vectors acting in perfect resonance with dynamic watercolor simulations.
+                </p>
+            </div>
+
+            <!-- Elegant Editorial Portfolio Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                
+                <!-- Collection Card 1 -->
+                <div class="group editorial-card rounded-2xl p-4 flex flex-col justify-between">
+                    <div class="aspect-[4/5] rounded-xl overflow-hidden relative mb-4">
+                        <!-- Custom Minimalist Fine Line SVG Art -->
+                        <div class="w-full h-full bg-[#FAF6F0] flex items-center justify-center p-8 transition-transform duration-700 group-hover:scale-102">
+                            <svg class="w-40 h-40 opacity-60 text-[#2C2A29]" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="60" cy="60" r="30" stroke="currentColor" stroke-width="0.3" stroke-dasharray="1 1"/>
+                                <line x1="60" y1="10" x2="60" y2="110" stroke="currentColor" stroke-width="0.3"/>
+                                <path d="M20 90 Q 60 50, 100 90" stroke="currentColor" stroke-width="0.5"/>
+                                <circle cx="60" cy="50" r="1.5" fill="#C28D75"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-[9px] uppercase tracking-widest text-[#8A9A86] font-semibold block mb-1">SERIES I / COMPOSITION A</span>
+                        <h3 class="font-serif text-lg text-[#2C2A29] font-light mb-1.5">Quiet Alignment</h3>
+                        <p class="text-gray-500 text-xs leading-relaxed mb-4 font-light">A exploration into tension, weight distribution, and the visual weight of single color droplets.</p>
+                        <span class="text-[10px] text-[#2C2A29] border-b border-[#2C2A29]/20 pb-0.5 group-hover:border-[#2C2A29] transition-all duration-300 cursor-pointer">Inquire Gallery Pricing <i class="fa-solid fa-chevron-right text-[8px] ml-1"></i></span>
+                    </div>
+                </div>
+
+                <!-- Collection Card 2 -->
+                <div class="group editorial-card rounded-2xl p-4 flex flex-col justify-between">
+                    <div class="aspect-[4/5] rounded-xl overflow-hidden relative mb-4">
+                        <div class="w-full h-full bg-[#FAF6F0] flex items-center justify-center p-8 transition-transform duration-700 group-hover:scale-102">
+                            <svg class="w-40 h-40 opacity-60 text-[#2C2A29]" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="30" y="30" width="60" height="60" stroke="currentColor" stroke-width="0.3"/>
+                                <path d="M30 60 C 45 40, 75 80, 90 60" stroke="currentColor" stroke-width="0.5"/>
+                                <circle cx="45" cy="50" r="1.2" fill="#8A9A86"/>
+                                <circle cx="75" cy="70" r="1.2" fill="#8A9A86"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-[9px] uppercase tracking-widest text-[#C28D75] font-semibold block mb-1">SERIES I / COMPOSITION B</span>
+                        <h3 class="font-serif text-lg text-[#2C2A29] font-light mb-1.5">Topological Whispers</h3>
+                        <p class="text-gray-500 text-xs leading-relaxed mb-4 font-light">Harmonic frequency lines captured inside clean rectangular confines, mirroring micro-architecture.</p>
+                        <span class="text-[10px] text-[#2C2A29] border-b border-[#2C2A29]/20 pb-0.5 group-hover:border-[#2C2A29] transition-all duration-300 cursor-pointer">Inquire Gallery Pricing <i class="fa-solid fa-chevron-right text-[8px] ml-1"></i></span>
+                    </div>
+                </div>
+
+                <!-- Collection Card 3 -->
+                <div class="group editorial-card rounded-2xl p-4 flex flex-col justify-between">
+                    <div class="aspect-[4/5] rounded-xl overflow-hidden relative mb-4">
+                        <div class="w-full h-full bg-[#FAF6F0] flex items-center justify-center p-8 transition-transform duration-700 group-hover:scale-102">
+                            <svg class="w-40 h-40 opacity-60 text-[#2C2A29]" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M60 20 L 95 80 L 25 80 Z" stroke="currentColor" stroke-width="0.3"/>
+                                <circle cx="60" cy="60" r="20" stroke="currentColor" stroke-width="0.4"/>
+                                <circle cx="60" cy="60" r="3" fill="#D4AF37"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-[9px] uppercase tracking-widest text-[#2C2A29] font-semibold block mb-1">SERIES I / COMPOSITION C</span>
+                        <h3 class="font-serif text-lg text-[#2C2A29] font-light mb-1.5">Concentric Slumber</h3>
+                        <p class="text-gray-500 text-xs leading-relaxed mb-4 font-light">A meditation on gold-leaf techniques and cosmic geometry, set against dynamic shifting spaces.</p>
+                        <span class="text-[10px] text-[#2C2A29] border-b border-[#2C2A29]/20 pb-0.5 group-hover:border-[#2C2A29] transition-all duration-300 cursor-pointer">Inquire Gallery Pricing <i class="fa-solid fa-chevron-right text-[8px] ml-1"></i></span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Dynamic Artist Statement Section -->
+        <section class="container mx-auto px-8 py-20 border-t border-[#2C2A29]/10 bg-white/5">
+            <div class="max-w-3xl mx-auto text-center">
+                <h3 class="font-serif text-2xl md:text-3xl text-[#2C2A29] font-light mb-5">"Digital space does not require neon glow or aggressive flashing to speak."</h3>
+                <p class="text-gray-500 leading-relaxed font-light text-sm mb-6">
+                    Each movement of silk strands, each fading blossom of watercolor, is dictated by physical simulations of thermal movement. Designed specifically to soothe, to frame, and to highlight human creation.
+                </p>
+                <div class="flex items-center justify-center space-x-3">
+                    <div class="h-[0.5px] w-10 bg-[#2C2A29]/20"></div>
+                    <span class="font-serif italic text-[#2C2A29] text-md">Hana Lin, Digital Naturalist</span>
+                    <div class="h-[0.5px] w-10 bg-[#2C2A29]/20"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Beautiful, Clean Footer -->
+        <footer class="editorial-glass border-t border-[#2C2A29]/5 py-8 px-8 mt-12">
+            <div class="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex flex-col items-center md:items-start text-center md:text-left">
+                    <span class="font-serif text-xs tracking-[0.25em] uppercase font-semibold">Hana Lin Creative Atelier</span>
+                    <span class="text-[9px] text-gray-400 mt-1">© 2026 Hana Lin. Shifting procedural landscapes via micro-vectors and Web Audio.</span>
+                </div>
+                <div class="flex space-x-5 text-gray-400">
+                    <a href="#" class="hover:text-[#2C2A29] transition-colors"><i class="fa-brands fa-pinterest-p text-sm"></i></a>
+                    <a href="#" class="hover:text-[#2C2A29] transition-colors"><i class="fa-brands fa-instagram text-sm"></i></a>
+                    <a href="#" class="hover:text-[#2C2A29] transition-colors"><i class="fa-brands fa-behance text-sm"></i></a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Minimal HUD info elements for the Pure Canvas Screen -->
+    <div id="canvas-hud-hint" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-1.5 pointer-events-none transition-opacity duration-500 opacity-100">
+        <span class="bg-[#FAF6F0]/80 backdrop-blur-md border border-[#2C2A29]/10 text-[9px] tracking-[0.2em] text-[#2C2A29] font-medium uppercase px-4 py-2 rounded-full flex items-center gap-1.5 shadow-md shadow-[#2C2A29]/3">
+            <span class="w-1.5 h-1.5 bg-[#8A9A86] rounded-full animate-pulse"></span>
+            Drag slow for air current • Click to drop ink colors
+        </span>
+        <span class="text-[9px] text-gray-400 font-light">Press "View Exhibition Layout" in the header to preview on a gallery layout.</span>
+    </div>
+
+    <!-- Elegant Toast Alerts (No browser pop-ups) -->
+    <div id="toast-message" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 editorial-glass border-l-2 border-l-[#8A9A86] px-5 py-2.5 rounded-lg transition-all duration-500 transform translate-y-16 opacity-0 pointer-events-none text-xs text-[#2C2A29] flex items-center gap-2.5 shadow-lg shadow-[#2C2A29]/3">
+        <i class="fa-solid fa-leaf text-[#8A9A86] text-xs"></i>
+        <span id="toast-text">Sensing landscape parameters...</span>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('generative-canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: false });
+
+        // Adaptive High DPI Setup
+        let devicePixelRatio = window.devicePixelRatio || 1;
+        function resizeCanvas() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            canvas.width = width * devicePixelRatio;
+            canvas.height = height * devicePixelRatio;
+            canvas.style.width = `${width}px`;
+            canvas.style.height = `${height}px`;
+            ctx.scale(devicePixelRatio, devicePixelRatio);
+        }
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            initVisualElements();
+        });
+        resizeCanvas();
+
+        // Aesthetic Settings
+        const params = {
+            ribbonCount: 24,
+            speed: 0.8,
+            tension: 5,
+            theme: 'botanical',
+            interactionMode: 'breeze', // breeze, paint
+            isWebsiteActive: false
+        };
+
+        // Sophisticated Palette definitions using light-themed values (very subtle pastel / warm hues)
+        const palettes = {
+            botanical: {
+                colors: [
+                    'rgba(138, 154, 134, 0.03)',  // Soft Sage
+                    'rgba(194, 141, 117, 0.03)',  // Terracotta Blush
+                    'rgba(218, 194, 150, 0.035)', // Muted Sand Gold
+                    'rgba(173, 184, 161, 0.03)'   // Pale Forest
+                ],
+                bgClear: 'rgba(250, 246, 240, 0.04)', // Cream
+                accent: '#8A9A86'
+            },
+            blush: {
+                colors: [
+                    'rgba(224, 185, 185, 0.03)',  // Dusty Pink
+                    'rgba(222, 198, 171, 0.03)',  // Sandy Apricot
+                    'rgba(189, 174, 174, 0.03)',  // Pale Lilac-Grey
+                    'rgba(207, 145, 134, 0.025)'  // Terracotta Red
+                ],
+                bgClear: 'rgba(253, 248, 245, 0.04)',
+                accent: '#C28D75'
+            },
+            mist: {
+                colors: [
+                    'rgba(152, 169, 181, 0.03)',  // Slate Sea Blue
+                    'rgba(177, 172, 191, 0.03)',  // Soft Lavender Grey
+                    'rgba(156, 179, 173, 0.03)',  // Pale Moss Green
+                    'rgba(194, 203, 209, 0.035)'  // Wet Silver
+                ],
+                bgClear: 'rgba(242, 245, 247, 0.04)',
+                accent: '#98A9B5'
+            },
+            terracotta: {
+                colors: [
+                    'rgba(191, 126, 96, 0.03)',   // Rich Clay
+                    'rgba(217, 186, 145, 0.035)', // Pale Gold Dust
+                    'rgba(145, 138, 128, 0.03)',  // River Pebbles
+                    'rgba(199, 157, 139, 0.03)'   // Rosewood
+                ],
+                bgClear: 'rgba(247, 242, 237, 0.04)',
+                accent: '#BF7E60'
+            },
+            minimalist: {
+                colors: [
+                    'rgba(44, 42, 41, 0.015)',    // Ink-wash black
+                    'rgba(115, 110, 107, 0.02)',   // Grey charcoal
+                    'rgba(186, 182, 178, 0.025)',  // Pale mist grey
+                    'rgba(44, 42, 41, 0.02)'       // Dark silk weave
+                ],
+                bgClear: 'rgba(250, 249, 247, 0.04)',
+                accent: '#2C2A29'
+            }
+        };
+
+        let ribbons = [];
+        let watercolorDroplets = [];
+        let mouse = { x: -1000, y: -1000, targetX: -1000, targetY: -1000, vx: 0, vy: 0, active: false };
+        let flowClock = 0;
+
+        // Mathematical Bezier Spline Silk Strands
+        class RibbonStrand {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                // Ribbons run primarily left-to-right or vertically depending on coordinate index
+                this.axis = Math.random() > 0.5 ? 'horizontal' : 'vertical';
+                this.anchorPoints = [];
+                this.pointCount = params.tension + 2; // Dynamic anchor counts (curves)
+                
+                const curPalette = palettes[params.theme].colors;
+                this.color = curPalette[Math.floor(Math.random() * curPalette.length)];
+                this.width = Math.random() * 0.8 + 0.2; // Exceedingly thin lines
+                this.speedMultiplier = Math.random() * 0.3 + 0.7;
+
+                // Set up anchor node positions
+                for (let i = 0; i < this.pointCount; i++) {
+                    const progress = i / (this.pointCount - 1);
+                    let x, y;
+
+                    if (this.axis === 'horizontal') {
+                        x = progress * window.innerWidth;
+                        y = window.innerHeight * 0.2 + Math.random() * (window.innerHeight * 0.6);
+                    } else {
+                        x = window.innerWidth * 0.2 + Math.random() * (window.innerWidth * 0.6);
+                        y = progress * window.innerHeight;
+                    }
+
+                    this.anchorPoints.push({
+                        baseX: x,
+                        baseY: y,
+                        x: x,
+                        y: y,
+                        offsetX: Math.random() * 1000,
+                        offsetY: Math.random() * 1000,
+                        velocityShift: Math.random() * 0.5 + 0.5
+                    });
+                }
+            }
+
+            update() {
+                // Wave noise dynamics applied to anchors
+                this.anchorPoints.forEach((pt, idx) => {
+                    // Skip edge anchors to lock lines neatly to screen edges
+                    if (idx === 0 || idx === this.pointCount - 1) return;
+
+                    // Calculate subtle noise based on flow timer
+                    const driftTime = flowClock * 0.25 * this.speedMultiplier;
+                    const noiseX = Math.sin(pt.offsetX + driftTime) * Math.cos(pt.offsetY + driftTime * 0.4);
+                    const noiseY = Math.cos(pt.offsetY + driftTime) * Math.sin(pt.offsetX + driftTime * 0.6);
+
+                    // Gentle drift return vector
+                    pt.x = pt.baseX + noiseX * 60;
+                    pt.y = pt.baseY + noiseY * 60;
+
+                    // Apply mouse interaction "thermodynamic breeze"
+                    if (mouse.active) {
+                        const dx = mouse.x - pt.x;
+                        const dy = mouse.y - pt.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+
+                        if (dist < 280) {
+                            // Silk threads sway gently away from mouse, then spring back
+                            const breezeForce = (280 - dist) / 280;
+                            
+                            if (params.interactionMode === 'breeze') {
+                                // Add smooth drag along mouse direction
+                                pt.x += mouse.vx * breezeForce * 6;
+                                pt.y += mouse.vy * breezeForce * 6;
+                            } else {
+                                // Slightly displace away from cursor
+                                pt.x -= (dx / dist) * breezeForce * 25;
+                                pt.y -= (dy / dist) * breezeForce * 25;
+                            }
+                        }
+                    }
+
+                    // Gentle bounds containment check
+                    pt.x = Math.max(0, Math.min(window.innerWidth, pt.x));
+                    pt.y = Math.max(0, Math.min(window.innerHeight, pt.y));
+                });
+            }
+
+            draw() {
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = this.width;
+                ctx.beginPath();
+                
+                // Draw splined threads using Quadratic Bezier Chains
+                ctx.moveTo(this.anchorPoints[0].x, this.anchorPoints[0].y);
+                
+                for (let i = 1; i < this.pointCount - 1; i++) {
+                    const xc = (this.anchorPoints[i].x + this.anchorPoints[i + 1].x) / 2;
+                    const yc = (this.anchorPoints[i].y + this.anchorPoints[i + 1].y) / 2;
+                    ctx.quadraticCurveTo(this.anchorPoints[i].x, this.anchorPoints[i].y, xc, yc);
+                }
+                
+                ctx.lineTo(this.anchorPoints[this.pointCount - 1].x, this.anchorPoints[this.pointCount - 1].y);
+                ctx.stroke();
+            }
+        }
+
+        // Organic watercolor wash simulation (simulates ink pigment expanding/absorbing on dry canvas)
+        class WatercolorDrop {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.maxRadius = Math.random() * 80 + 40;
+                this.currentRadius = 1;
+                this.expandSpeed = Math.random() * 0.4 + 0.3;
+                this.life = 1.0; // Decay rate representing pigment drying
+                this.decay = Math.random() * 0.003 + 0.002;
+                
+                // Random subtle color selected from current palette range
+                const curPalette = palettes[params.theme].colors;
+                const baseColor = curPalette[Math.floor(Math.random() * curPalette.length)];
+                
+                // Build a custom amorphous polygon shell path to simulate uneven watercolor bleed
+                this.vertices = [];
+                const ptCount = Math.floor(Math.random() * 6) + 8;
+                for (let i = 0; i < ptCount; i++) {
+                    const angle = (i / ptCount) * Math.PI * 2;
+                    const jaggedness = Math.random() * 0.3 + 0.85; // Natural leaf/blossom edge
+                    this.vertices.push({
+                        angle: angle,
+                        jaggedness: jaggedness,
+                        currentX: x,
+                        currentY: y
+                    });
+                }
+                
+                this.color = baseColor;
+            }
+
+            update() {
+                if (this.currentRadius < this.maxRadius) {
+                    this.currentRadius += this.expandSpeed;
+                    // Slow down expansion as it meets paper absorption threshold
+                    this.expandSpeed *= 0.99;
+                }
+                
+                this.life -= this.decay;
+                
+                // Calculate physical morph vertices
+                this.vertices.forEach(vert => {
+                    const targetDistance = this.currentRadius * vert.jaggedness;
+                    vert.currentX = this.x + Math.cos(vert.angle) * targetDistance;
+                    vert.currentY = this.y + Math.sin(vert.angle) * targetDistance;
+                    
+                    // Add micro noise drift simulating uneven fibers in the paper
+                    vert.currentX += Math.sin(flowClock + vert.angle * 10) * 0.15;
+                    vert.currentY += Math.cos(flowClock + vert.angle * 10) * 0.15;
+                });
+
+                return this.life > 0;
+            }
+
+            draw() {
+                if (this.life <= 0) return;
+                
+                // Construct and fill the amorphous watercolor blob
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.moveTo(this.vertices[0].currentX, this.vertices[0].currentY);
+                
+                for (let i = 1; i < this.vertices.length; i++) {
+                    ctx.lineTo(this.vertices[i].currentX, this.vertices[i].currentY);
+                }
+                
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+
+        // Setup arrays and spawn threads
+        function initVisualElements() {
+            ribbons = [];
+            for (let i = 0; i < params.ribbonCount; i++) {
+                ribbons.push(new RibbonStrand());
+            }
+        }
+
+        let audioCtx = null;
+        let masterGain = null;
+        let reverbDelayNode = null;
+        let audioSynthInitialized = false;
+
+        function initAmbientSynth() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+
+                // Master volume controller
+                masterGain = audioCtx.createGain();
+                masterGain.gain.setValueAtTime(0, audioCtx.currentTime); // Sound starts muted and transitions smoothly
+
+                // Reverb/Delay echo unit to create soft cathedral/space feeling
+                reverbDelayNode = audioCtx.createDelay(1.5);
+                const delayFeedback = audioCtx.createGain();
+                reverbDelayNode.delayTime.setValueAtTime(0.65, audioCtx.currentTime);
+                delayFeedback.gain.setValueAtTime(0.45, audioCtx.currentTime);
+
+                reverbDelayNode.connect(delayFeedback);
+                delayFeedback.connect(reverbDelayNode);
+
+                reverbDelayNode.connect(masterGain);
+                masterGain.connect(audioCtx.destination);
+
+                audioSynthInitialized = true;
+            } catch (e) {
+                console.warn("Audio Context init stalled:", e);
+            }
+        }
+
+        // Play pristine, plucky chime resembling Zen Kalimbas or glass wind chimes
+        function triggerChimeSound() {
+            if (!audioSynthInitialized || !audioCtx || masterGain.gain.value === 0) return;
+
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            const filter = audioCtx.createBiquadFilter();
+
+            // Pentatonic scale of perfect serene intervals (Japanese Hon-Kumoi-Choshi feel)
+            const pentatonicScale = [220.00, 246.94, 261.63, 329.63, 392.00, 440.00, 493.88, 523.25, 659.25, 783.99, 880.00, 1046.50];
+            const randomNote = pentatonicScale[Math.floor(Math.random() * pentatonicScale.length)];
+
+            osc.type = Math.random() > 0.4 ? 'sine' : 'triangle'; // Mixed organic bell textures
+            osc.frequency.setValueAtTime(randomNote, audioCtx.currentTime);
+
+            // High frequency, ultra-short decay plucking envelope
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.04, audioCtx.currentTime + 0.01); // Quick attack pluck
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 2.5); // Warm slow fade decay
+
+            // Low-pass warm filter to keep sound rounded and gentle on ears
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(1200, audioCtx.currentTime);
+
+            osc.connect(gainNode);
+            gainNode.connect(filter);
+            filter.connect(reverbDelayNode);
+            filter.connect(masterGain);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 2.8);
+        }
+
+        let lastMouseTriggerTime = 0;
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Increment the silent thermodynamic wave clock
+            flowClock += 0.004 * params.speed;
+
+            // Clear frame utilizing low alpha for organic paper watercolor bleeding / trace memory
+            ctx.fillStyle = palettes[params.theme].bgClear;
+            ctx.globalAlpha = 1.0;
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+
+            // Draw active watercolor pigment layers
+            for (let i = watercolorDroplets.length - 1; i >= 0; i--) {
+                const isAlive = watercolorDroplets[i].update();
+                if (!isAlive) {
+                    watercolorDroplets.splice(i, 1);
+                } else {
+                    watercolorDroplets[i].draw();
+                }
+            }
+
+            // Draw delicate silk ribbons on top
+            for (let i = 0; i < ribbons.length; i++) {
+                ribbons[i].update();
+                ribbons[i].draw();
+            }
+
+            // Calculate subtle mouse momentum
+            if (mouse.active) {
+                const prevX = mouse.x;
+                const prevY = mouse.y;
+                mouse.x += (mouse.targetX - mouse.x) * 0.12;
+                mouse.y += (mouse.targetY - mouse.y) * 0.12;
+                mouse.vx = mouse.x - prevX;
+                mouse.vy = mouse.y - prevY;
+
+                // Play ultra-soft audio chime dynamically when cursor travels medium-fast
+                const speed = Math.sqrt(mouse.vx * mouse.vx + mouse.vy * mouse.vy);
+                const now = Date.now();
+                if (speed > 8 && now - lastMouseTriggerTime > 600) {
+                    triggerChimeSound();
+                    lastMouseTriggerTime = now;
+                }
+            }
+        }
+
+        // Coordinate catchers
+        function getCoordinateState(e) {
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            mouse.targetX = clientX;
+            mouse.targetY = clientY;
+            if (!mouse.active) {
+                mouse.x = clientX;
+                mouse.y = clientY;
+                mouse.active = true;
+            }
+        }
+
+        window.addEventListener('mousemove', getCoordinateState);
+        window.addEventListener('touchmove', getCoordinateState, { passive: true });
+
+        window.addEventListener('mouseleave', () => { mouse.active = false; });
+        window.addEventListener('touchend', () => { mouse.active = false; });
+
+        // Click / Touch release watercolor droplet blots
+        function handleScreenPress(e) {
+            if (e.target.closest('#control-panel') || e.target.closest('nav') || e.target.closest('#export-canvas-btn')) return;
+
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            // Generate watercolor paint drop
+            watercolorDroplets.push(new WatercolorDrop(clientX, clientY));
+            triggerChimeSound();
+        }
+
+        window.addEventListener('mousedown', handleScreenPress);
+        window.addEventListener('touchstart', handleScreenPress, { passive: true });
+
+        const controlPanel = document.getElementById('control-panel');
+        const toggleControlsBtn = document.getElementById('controls-toggle-btn');
+        const closePanelBtn = document.getElementById('close-panel-btn');
+
+        toggleControlsBtn.addEventListener('click', () => {
+            controlPanel.classList.toggle('translate-x-0');
+            controlPanel.classList.toggle('opacity-100');
+            controlPanel.classList.toggle('translate-x-12');
+            controlPanel.classList.toggle('opacity-0');
+            controlPanel.classList.toggle('pointer-events-none');
+        });
+
+        closePanelBtn.addEventListener('click', () => {
+            controlPanel.classList.add('translate-x-12', 'opacity-0', 'pointer-events-none');
+        });
+
+        // Theme palette selection dropdown listener
+        const paletteSelect = document.getElementById('palette-select');
+        paletteSelect.addEventListener('change', (e) => {
+            params.theme = e.target.value;
+            
+            // Set dynamic button and slider accent states on the UI
+            const accent = palettes[params.theme].accent;
+            document.querySelectorAll('.accent-\\[\\#8A9A86\\]').forEach(el => {
+                el.style.accentColor = accent;
+            });
+
+            // Fast refresh existing ribbon thread hues on theme modification
+            ribbons.forEach(rib => {
+                const choice = palettes[params.theme].colors;
+                rib.color = choice[Math.floor(Math.random() * choice.length)];
+            });
+            
+            showToast(`Theme changed to ${e.target.options[e.target.selectedIndex].text}`);
+        });
+
+        // Fine slider inputs
+        const ribbonCountSlider = document.getElementById('ribbon-count-slider');
+        const ribbonCountVal = document.getElementById('ribbon-count-val');
+        ribbonCountSlider.addEventListener('input', (e) => {
+            params.ribbonCount = parseInt(e.target.value);
+            ribbonCountVal.textContent = `${params.ribbonCount} Strands`;
+            initVisualElements();
+        });
+
+        const speedSlider = document.getElementById('speed-slider');
+        const speedVal = document.getElementById('speed-val');
+        speedSlider.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            params.speed = val;
+            if (val <= 0.4) speedVal.textContent = "Silent Drifting";
+            else if (val <= 1.0) speedVal.textContent = "Gentle";
+            else if (val <= 1.6) speedVal.textContent = "Brisk Flow";
+            else speedVal.textContent = "Swirling Wind";
+        });
+
+        const tensionSlider = document.getElementById('tension-slider');
+        const tensionVal = document.getElementById('tension-val');
+        tensionSlider.addEventListener('input', (e) => {
+            const val = parseInt(e.target.value);
+            params.tension = val;
+            if (val <= 3) tensionVal.textContent = "Stretched Cord";
+            else if (val <= 5) tensionVal.textContent = "Fluid Waves";
+            else tensionVal.textContent = "Lace Curvature";
+            initVisualElements();
+        });
+
+        // Mouse Brush Style Toggles
+        const brushBtns = document.querySelectorAll('.brush-btn');
+        brushBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                brushBtns.forEach(b => {
+                    b.classList.remove('bg-[#2C2A29]', 'text-white');
+                    b.classList.add('border', 'border-[#2C2A29]/10', 'hover:bg-[#2C2A29]/5', 'text-[#2C2A29]');
+                });
+                btn.classList.add('bg-[#2C2A29]', 'text-white');
+                btn.classList.remove('border', 'border-[#2C2A29]/10', 'hover:bg-[#2C2A29]/5', 'text-[#2C2A29]');
+                params.interactionMode = btn.getAttribute('data-mode');
+            });
+        });
+
+        // Sound Module Activation Trigger
+        const audioToggleBtn = document.getElementById('audio-toggle-btn');
+        const audioIcon = document.getElementById('audio-icon');
+        
+        audioToggleBtn.addEventListener('click', () => {
+            if (!audioSynthInitialized) {
+                initAmbientSynth();
+            }
+
+            if (audioCtx) {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                if (masterGain.gain.value === 0) {
+                    masterGain.gain.setTargetAtTime(0.5, audioCtx.currentTime, 0.4); // Fade bell output smoothly
+                    audioIcon.className = 'fa-solid fa-volume-high text-[#C28D75] text-xs';
+                    audioToggleBtn.classList.add('shadow-md', 'shadow-[#C28D75]/10');
+                    showToast("Crystalline Wind Chime Synthesizer Activated");
+                } else {
+                    masterGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.25);
+                    audioIcon.className = 'fa-solid fa-volume-xmark text-gray-400 text-xs';
+                    audioToggleBtn.classList.remove('shadow-md', 'shadow-[#C28D75]/10');
+                    showToast("Chimes Muted");
+                }
+            }
+        });
+
+        // System feedback toast
+        function showToast(message) {
+            const toast = document.getElementById('toast-message');
+            const toastText = document.getElementById('toast-text');
+            toastText.textContent = message;
+            toast.classList.remove('translate-y-16', 'opacity-0', 'pointer-events-none');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-16', 'opacity-0', 'pointer-events-none');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+
+        // Export snapshot trigger
+        const exportBtn = document.getElementById('export-canvas-btn');
+        exportBtn.addEventListener('click', () => {
+            const exportCanvas = document.createElement('canvas');
+            exportCanvas.width = canvas.width;
+            exportCanvas.height = canvas.height;
+            const expCtx = exportCanvas.getContext('2d');
+
+            // Render high-res snapshot layer
+            expCtx.fillStyle = params.theme === 'minimalist' ? '#FAF9F7' : '#FAF6F0';
+            expCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+            expCtx.drawImage(canvas, 0, 0);
+
+            try {
+                const downloadLink = document.createElement('a');
+                downloadLink.download = `serene-silk-painting-${params.theme}.png`;
+                downloadLink.href = exportCanvas.toDataURL('image/png');
+                downloadLink.click();
+                showToast("Serene masterpiece downloaded successfully!");
+            } catch (err) {
+                showToast("Export process was blocked.");
+            }
+        });
+
+        // Layout switches (Minimalist paper mockup overlay toggle)
+        const toggleModeBtn = document.getElementById('toggle-mode-btn');
+        const modeBtnText = document.getElementById('mode-btn-text');
+        const portfolioOverlay = document.getElementById('portfolio-overlay');
+        const canvasHudHint = document.getElementById('canvas-hud-hint');
+        const heroCustomiseBtn = document.getElementById('hero-customise-btn');
+
+        toggleModeBtn.addEventListener('click', () => {
+            params.isWebsiteActive = !params.isWebsiteActive;
+            updateExhibitionLayout();
+        });
+
+        heroCustomiseBtn.addEventListener('click', () => {
+            controlPanel.classList.remove('translate-x-12', 'opacity-0', 'pointer-events-none');
+            controlPanel.classList.add('translate-x-0', 'opacity-100');
+        });
+
+        function updateExhibitionLayout() {
+            if (params.isWebsiteActive) {
+                portfolioOverlay.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-8');
+                portfolioOverlay.classList.add('opacity-100', 'translate-y-0');
+                canvasHudHint.classList.add('opacity-0');
+                modeBtnText.textContent = "View Pure Canvas";
+                showToast("Exhibition Room Loaded");
+            } else {
+                portfolioOverlay.classList.add('opacity-0', 'pointer-events-none', 'translate-y-8');
+                portfolioOverlay.classList.remove('opacity-100', 'translate-y-0');
+                canvasHudHint.classList.remove('opacity-0');
+                modeBtnText.textContent = "View Exhibition Layout";
+                showToast("Pure Canvas Mode Restored");
+            }
+        }
+
+        window.onload = function () {
+            initVisualElements();
+            animate();
+            
+            // Subtle entrance toast
+            setTimeout(() => {
+                showToast("Serene Canvas ready. Glide cursor slowly.");
+            }, 1000);
+        };
+    </script>
+</body>
+</html>
